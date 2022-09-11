@@ -1,0 +1,44 @@
+5. Research some useful Slurm tools (one sentence responses):
+a) In what directory does a Slurm job on Euler begin execution? You may run some jobs in
+different directories to check this.
+
+$SLURM_SUBMIT_DIR
+
+b) Explain what SLURM JOB ID is in the environment of a running Slurm job.
+The ID of job which is allocated
+
+c) How would you track the status of job(s) run by yourself? Assume that the job(s) have not
+been completed yet.
+
+Below command to show the status of jobs wrt. flags
+squeue <flags>
+-u username
+-j jobid
+-p partition
+-q qos
+
+Below command shows status of all pending jobs
+squeue <flags> --start
+
+Shows status of all pending jobs of the given user
+squeue -u <username> --start
+
+Shows status of the given pending job
+squeue -j <jobid> --start
+
+Shows status of all pending jobs in the given partition
+squeue -p <partition> --start
+
+Shows status of all pending jobs in the given qos
+squeue -q <qos> --start
+
+d) How would you cancel a job submitted by yourself? Assume that the job is still in the queue.
+
+Kill the job using job ID
+$ scancel <jobID>
+
+e) Explain what the following script header line specifies: #SBATCH --gres=gpu:1
+It allocates a gpu
+
+f) (Optional) Explain what the following script header line specifies: #SBATCH --array=0-9
+Submits a job array with index values between 0 and 9
