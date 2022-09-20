@@ -14,8 +14,8 @@ int main(){
     high_resolution_clock::time_point end;
     duration<double, std::milli> duration_sec;
     srand (static_cast <unsigned> (time(0)));
-    int n= 1000 + static_cast <int> (rand()) /( static_cast <int> (RAND_MAX/(10000)));
-    n=1024;
+    // int n= 1000 + static_cast <int> (rand()) /( static_cast <int> (RAND_MAX/(10000)));
+    int n=1024;
     double *A= new double[n*n];
     double *B= new double[n*n];
     double *C= new double[n*n];
