@@ -39,7 +39,7 @@ int main(){
     cout<<duration_sec.count()<<endl;
     cout<<C[n*n-1]<<endl;
     delete[] C;
-    C= new double[n*n];
+    C= new double[n*n]();
 
     start = high_resolution_clock::now();
     mmul2(A,B,C,n);
@@ -48,7 +48,7 @@ int main(){
     cout<<duration_sec.count()<<endl;
     cout<<C[n*n-1]<<endl;
     delete[] C;
-    C= new double[n*n];
+    C= new double[n*n]();
 
     start = high_resolution_clock::now();
     mmul3(A,B,C,n);
@@ -57,7 +57,7 @@ int main(){
     cout<<duration_sec.count()<<endl;
     cout<<C[n*n-1]<<endl;
     delete[] C;
-    C= new double[n*n];
+    C= new double[n*n]();
 
     start = high_resolution_clock::now();
     mmul4(vecA,vecB,C,n);
