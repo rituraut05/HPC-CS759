@@ -1,4 +1,4 @@
-#include<iostream>
+#include <iostream>
 using namespace std;
 
 /*
@@ -6,17 +6,19 @@ Q1. Write a C++ program using CUDA in a file calledtask1.cuwhich computes the fa
 */
 
 // Kernel function to find the factorial of the given number
-__global__ 
-void factorial(){
+__global__ void factorial()
+{
     int tid = threadIdx.x;
     int fact = 1;
-    for(int i = 1; i <= tid+1; i++){
+    for (int i = 1; i <= tid + 1; i++)
+    {
         fact *= i;
     }
-    printf("%d!=%d\n", tid+1, fact);
+    printf("%d!=%d\n", tid + 1, fact);
 }
 
-int main(){
+int main()
+{
     int n = 8;
 
     // Launch kernel on 1 block with 8 threads
