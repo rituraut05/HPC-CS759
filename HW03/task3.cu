@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     cudaEventRecord(start);
 
     // Call the kernel
-    vscale<<<numBlocks, numThreads>>>(d_a, d_b);
+    vscale<<<numBlocks, numThreads>>>(d_a, d_b, n);
 
     cudaDeviceSynchronize();    // Wait for the kernel to finish
     cudaEventRecord(stop);      // Record the time when the kernel finishes
