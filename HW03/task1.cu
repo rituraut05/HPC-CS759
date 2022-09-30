@@ -7,14 +7,14 @@ __global__
 void factorial(){
     int tid = threadIdx.x;
     int fact = 1;
-    for(int i = 1; i <= tid; i++){
+    for(int i = 1; i <= tid+1; i++){
         fact *= i;
     }
-    printf("%d!=%d\n", tid, fact);
+    printf("%d!=%d\n", tid+1, fact);
 }
 int main(){
     int n = 8;
-    factorial<<<1, n>>>;
+    factorial<<<1, n>>>();
     cudaDeviceSynchronize();
     return 0;
 }
