@@ -42,9 +42,9 @@ int main(int argc, char *argv[])
     float *d_A, *d_B, *d_C; //device matrices
 
     // Allocate memory on device
-    cudaMalloc((void **)&d_A, size * sizeof(float));
-    cudaMalloc((void **)&d_B, size * sizeof(float));
-    cudaMalloc((void **)&d_C, size * sizeof(float));
+    cudaMallocManaged(&d_A, size * sizeof(float));
+    cudaMallocManaged(&d_B, size * sizeof(float));
+    cudaMallocManaged(&d_C, size * sizeof(float));
 
     // Fill host matrices with random numbers
     random_device rd;
@@ -57,9 +57,9 @@ int main(int argc, char *argv[])
     }
 
     // Copy host matrices to device
-    cudaMallocManaged(d_A, A, size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMallocManaged(d_B, B, size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMallocManaged(d_C, C, size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_A, A, size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, B, size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_C, C, size * sizeof(float), cudaMemcpyHostToDevice);
 
     // Create CUDA events
     cudaEvent_t start, stop;
