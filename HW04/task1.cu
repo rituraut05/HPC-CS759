@@ -7,7 +7,7 @@ implement them in your code for it to work properly):Create matrices
 2. Fill these matrices with random numbers in the range [-1, 1]
 3. Prepare arrays that are allocated as device memory 
     (they will be passed to your matmul function.)
-4. Call yourmatmulfunction.
+4. Call your matmul function.
 5. Print the last element of the resulting matrix.
 6. Print the time taken to execute your matmul function
     in milliseconds using CUDA events.
@@ -26,13 +26,11 @@ implement them in your code for it to work properly):Create matrices
 
 using namespace std;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     int n = atoi(argv[1]); //row or column dimension of matrix
     int threads_per_block = atoi(argv[2]); //threads per block
     int size = n * n; //size of matrix
-    int blocks_per_grid = (size + threads_per_block - 1) / threads_per_block; //blocks per grid
-    
+    // int blocks_per_grid = (size + threads_per_block - 1) / threads_per_block; //blocks per grid
 
     //create host matrices
     float *A = new float[size]; 
@@ -68,7 +66,7 @@ int main(int argc, char *argv[])
     cudaEventRecord(start); //start timer
 
     // Call matmul kernel function
-    matmul<<<blocks_per_grid, threads_per_block>>>(d_A, d_B, d_C, n);
+    matmul(d_A, d_B, d_C, n, threads_per_block);
 
     cudaEventRecord(stop); //stop timer
     cudaEventSynchronize(stop); //wait for stop event to complete
@@ -77,6 +75,18 @@ int main(int argc, char *argv[])
 
     // Copy result from device to host
     cudaMemcpy(C, d_C, size * sizeof(float), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < size; i++){
+    //     printf("%f ", A[i]);
+    // }
+    // printf("\n");
+    // for(int i = 0; i < size; i++){
+    //     printf("%f ", B[i]);
+    // }
+    // printf("\n");
+    // for(int i = 0; i < size; i++){
+    //     printf("%f ", C[i]);
+    // }
+    // cout<<endl;
     cout << C[size - 1] << endl;
     cout << milliseconds << endl;
     cudaFree(d_A);
