@@ -22,28 +22,29 @@
 template <typename T>
 __global__ void matmul_kernel(const T *A, const T *B, T *C, unsigned int n) {
     extern __shared__ float shMem[];
-    int bdim = blockDim.x;
-    int bx = blockIdx.x;
-    int by = blockIdx.y; 
-    int tx = threadIdx.x;
-    int ty = threadIdx.y;
-    float *shA = shMem;
-    float *shB = shA + bdim * bdim;
-    int index =  n * bdim * by + bdim * bx + n * ty + tx;
-    int aBegin = n * bdim * by;
-    int aEnd = aBegin + n - 1;
-    int aStep = bdim;
-    int bBegin = bdim * bx;
-    int bStep = bdim * n;
-    T Csub = 0;
+    int bdim = blockDim.x; // block dimension
+    int bx = blockIdx.x; // block index x
+    int by = blockIdx.y;  // block index y
+    int tx = threadIdx.x; // thread index x
+    int ty = threadIdx.y; // thread index y
+    float *shA = shMem; // shared memory for A
+    float *shB = shA + bdim * bdim; // shared memory for B
+    int idx =  n * bdim * by + bdim * bx + n * ty + tx; // index of C
+    int startA = n * bdim * by; // index of starting of A
+    int endA = startA + n - 1; // index of ending of A
+    int jumpA = bdim; // step size of A
+    int startB = bdim * bx; // index of starting of B
+    int jumpB = bdim * n; // step size of B
+    T Cans = 0;
 
-    for (int a = aBegin, b = bBegin; a <= aEnd; a += aStep, b += bStep) {
+    for (int a = startA, b = startB; a <= endA; a += jumpA, b += jumpB) {
         int ArowInd = a / n;
         int AcolInd = a % n;
         int Aind = a + n * ty + tx;
         int Bind = b + n * ty + tx;
         int BrowInd = b / n;
         int BcolInd = b % n;
+
         if (Aind / n >= n || (ArowInd + ty >= n) || Aind % n < AcolInd || (AcolInd + tx >= n)) {
             shA[ty * bdim + tx] = 0;
         }
@@ -59,7 +60,7 @@ __global__ void matmul_kernel(const T *A, const T *B, T *C, unsigned int n) {
         __syncthreads();
 
         for (int k = 0; k < bdim; ++k) {
-            Csub += shA[ty * bdim + k] * shB[k * bdim + tx];
+            Cans += shA[ty * bdim + k] * shB[k * bdim + tx];
         }
 
         __syncthreads();
@@ -67,9 +68,8 @@ __global__ void matmul_kernel(const T *A, const T *B, T *C, unsigned int n) {
 
     }
 
-    if (index < n * n && (aBegin % n + threadIdx.x < n) && (aBegin / n + ty < n)
-    && (bBegin % n + threadIdx.x < n) && (bBegin / n + threadIdx.y < n)) {
-        C[index] = Csub;
+    if (idx < n * n && (startA % n + threadIdx.x < n) && (startA / n + ty < n) && (startB % n + threadIdx.x < n) && (startB / n + threadIdx.y < n)) {
+        C[idx] = Cans;
     }
 
 }
