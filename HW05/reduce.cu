@@ -24,7 +24,19 @@ __global__ void reduce_kernel(float* g_idata, float* g_odata, unsigned int n) {
     // first index of element for sum reduction
     unsigned int i = bid * (bdim*2) + tid; 
     // reduced 2 elements per thread
-    shMemArray[tid] = g_idata[i] + g_idata[i + bdim];
+
+        if (i<n){
+        if (i+blockDim.x<n)
+            {
+                shMemArray[tid] = g_idata[i]+g_idata[i+blockDim.x];
+            }
+        else{
+                shMemArray[tid] = g_idata[i];
+        }
+
+    }
+       
+    // shMemArray[tid] = g_idata[i] + g_idata[i + bdim];
 
     __syncthreads(); // wait for all threads to finish
 
@@ -54,6 +66,7 @@ __host__ void reduce(float** input, float** output, unsigned int N, unsigned int
         unsigned int blocks=1; // 
         if (threads_per_block < N){
             blocks = (N + threads_per_block - 1) / (2 * threads_per_block);
+            // blocks = ceil((1.0*blocks/2));
         }
 
         // call reduce_kernel

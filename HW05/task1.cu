@@ -40,8 +40,8 @@ int main(int argc, char* argv[]) {
         mt19937 gen(rd());
         uniform_real_distribution<> dis(-1, 1);
         for (int i = 0; i < n; i++) {
-            // h_input[i] = dis(gen);
-            h_input[i] = 1;
+            h_input[i] = dis(gen);
+            // h_input[i] = 1;
         }
 
         // copy the host input array to the device
