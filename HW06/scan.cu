@@ -74,7 +74,7 @@ __host__ void scan(const float* input, float* output, unsigned int n, unsigned i
     }
 
     // call the kernel to perform the scan
-    int gridSize = 2*threads_per_block*sizeof(float)
+    int gridSize = 2*threads_per_block*sizeof(float);
     kernel<<<blocks,threads_per_block,gridSize>>>(output,input,n);
     cudaDeviceSynchronize(); // wait for the kernel to finish
 
@@ -83,7 +83,7 @@ __host__ void scan(const float* input, float* output, unsigned int n, unsigned i
     cudaDeviceSynchronize(); // wait for the kernel to finish
 
     // call the kernel to perform the scan on the intermediate input array
-    gridSize = 2*blocks*sizeof(float)
+    gridSize = 2*blocks*sizeof(float);
     kernel<<<1,blocks,gridSize>>>(tempOutput, tempInput, blocks);
     cudaDeviceSynchronize(); // wait for the kernel to finish
 
