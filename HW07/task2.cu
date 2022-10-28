@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 {   
     unsigned int n = atoi(argv[1]); //size of vector
     
-    thrust::host_vector<int> H(n);
+    thrust::host_vector<int> hostInput(n);
 
     // random number generator
     random_device rd;
@@ -37,17 +37,17 @@ int main(int argc, char *argv[])
     
     //fill vector with random numbers
     for (unsigned int i = 0; i < n; i++){
-        H[i] =dis(gen);
+        hostInput[i] =dis(gen);
     }
 
     // device vectors for input and output
-    thrust::device_vector<int> D(n); 
-    thrust::device_vector<int> V(n);
-    thrust::device_vector<int> C(n);
+    thrust::device_vector<int> deviceInput(n); 
+    thrust::device_vector<int> values(n);
+    thrust::device_vector<int> counts(n);
     
 
     // copy data to the device
-    thrust::copy(H.begin(), H.end(), D.begin());
+    thrust::copy(hostInput.begin(), hostInput.end(), deviceInput.begin());
     
     // cuda event variables
     cudaEvent_t start, stop; // cuda start and stop events
@@ -56,13 +56,15 @@ int main(int argc, char *argv[])
     cudaEventRecord(start); // record start event
 
     // call count function
-    count(D,V,C);
+    count(deviceInput,values,counts);
 
     cudaEventRecord(stop, 0); // record stop event
     cudaEventSynchronize(stop); // wait for stop event to complete
 
-    printf("%d\n", V.back());
-    printf("%d\n", C.back());
+    cout<<values.back()<<endl;
+    cout<<counts.back()<<endl;
+    // printf("%d\n", values.back());
+    // printf("%d\n", counts.back());
     
     float milliseconds; // time taken in milliseconds
     cudaEventElapsedTime(&milliseconds, start, stop); // calculate time taken
