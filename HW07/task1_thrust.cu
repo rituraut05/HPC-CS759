@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {   
     unsigned int n = atoi(argv[1]); // number of elements
-    thrust::host_vector<float> H(n); // host vector
+    thrust::host_vector<float> hostInput(n); // host vector
 
     // random number generator
     random_device rd;
@@ -19,12 +19,12 @@ int main(int argc, char *argv[])
     
     // fill host vector with random numbers
     for (unsigned int i = 0; i < n; i++){
-        H[i] = dist(gen);
+        hostInput[i] = dist(gen);
     }
 
     // copy host vector to device vector
-    thrust::device_vector<float> D(n);
-    thrust::copy(H.begin(), H.end(), D.begin());
+    thrust::device_vector<float> deviceInput(n);
+    thrust::copy(hostInput.begin(), hostInput.end(), deviceInput.begin());
 
     // time events
     cudaEvent_t start, stop; // start and stop events
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     cudaEventRecord(start); // record start event
 
     // compute the reduce function
-    auto sum = thrust::reduce(D.begin(), D.end(), (float) 0, thrust::plus<float>());
+    auto sum = thrust::reduce(deviceInput.begin(), deviceInput.end(), (float) 0, thrust::plus<float>());
 
     cudaEventRecord(stop, 0); // record stop event
     cudaEventSynchronize(stop); // wait for stop event to complete
@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
     cudaEventDestroy(stop); // destroy stop event
 
     // free memory
-    // H.clear();
+    // hostInput.clear();
     // D.clear();
-    // H.shrink_to_fit();
+    // hostInput.shrink_to_fit();
     // D.shrink_to_fit();
     
 
