@@ -89,9 +89,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("%f\n", max_dist); // print max distance"
-    printf("%zu\n", t_id); // print thread id
-    printf("%f\n", T / 10); // print average time
+    cout <<max_dist<<endl; // print max distance
+    cout <<t_id<<endl; // print thread id
+    cout <<T/10<<endl; // print average time
 
     return 0;
 }
