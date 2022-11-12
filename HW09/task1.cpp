@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     {
         omp_set_num_threads(t); // set number of threads
         auto start = high_resolution_clock::now(); // start timer
-        cluster(n, t, arr, centers, dists); // call cluster function
+        cluster(n, t, array, centers, dists); // call cluster function
         auto end = high_resolution_clock::now(); // end timer
         T += duration_cast<duration<double, std::milli>>(end - start).count(); // add time to T
     }
