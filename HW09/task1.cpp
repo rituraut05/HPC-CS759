@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     mt19937_64 generator(entropy_source());
 
     // range for random number
-    const int min = 0, max = 1;
+    const int min = 0, max = n;
 
     // random number distribution
     uniform_real_distribution<float> dist(min, max);
