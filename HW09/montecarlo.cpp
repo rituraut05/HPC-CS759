@@ -17,10 +17,7 @@ int montecarlo(const size_t n, const float *x, const float *y, const float radiu
                                         : sum)
     for (size_t i = 0; i < n; i++)
     {
-        if (x[i] * x[i] + y[i] * y[i] < radius * radius) // check if point is inside circle
-        {
-            sum++;
-        }
+        if (x[i] * x[i] + y[i] * y[i] < radius * radius)
         {
             sum += 1;
         }
