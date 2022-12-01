@@ -41,92 +41,62 @@ int main(int argc, char * argv[]){
     for (int i = 0; i < n; i++)
     {
         vector.data[i] = dist(generator);
+        // vector.data[i] = 1;
     }
 
     data_t dest;
 
-    // optimize1
-    auto start = high_resolution_clock::now();
-    optimize1(&vector, &dest);
-    auto end = high_resolution_clock::now();
+    float T = 0.0;
+    for(int i=0; i<10; i++){
+        auto start = high_resolution_clock::now();
+        optimize1(&vector, &dest);
+        auto end = high_resolution_clock::now();
+        T += duration_cast<duration<double, milli>>(end - start).count();
+    }
     cout << dest << endl;
-    cout <<duration_cast<duration<double, milli>>(end - start).count() << endl;
+    cout << T/10 << endl;
 
-
-    // optimize2
-    start = high_resolution_clock::now();
-    optimize2(&vector, &dest);
-    end = high_resolution_clock::now();
+    T = 0.0;
+    for(int i=0; i<10; i++){
+        auto start = high_resolution_clock::now();
+        optimize2(&vector, &dest);
+        auto end = high_resolution_clock::now();
+        T += duration_cast<duration<double, milli>>(end - start).count();
+    }
     cout << dest << endl;
-    cout << duration_cast<duration<double, milli>>(end - start).count() << endl;
+    cout << T/10 << endl;
 
-    // optimize3
-    start = high_resolution_clock::now();
-    optimize3(&vector, &dest);
-    end = high_resolution_clock::now();
+    T = 0.0;
+    for(int i=0; i<10; i++){
+        auto start = high_resolution_clock::now();
+        optimize3(&vector, &dest);
+        auto end = high_resolution_clock::now();
+        T += duration_cast<duration<double, milli>>(end - start).count();
+    }
     cout << dest << endl;
-    cout << duration_cast<duration<double, milli>>(end - start).count() << endl;
+    cout << T/10 << endl;
 
-    // optimize4
-    start = high_resolution_clock::now();
-    optimize4(&vector, &dest);
-    end = high_resolution_clock::now();
+
+    T = 0.0;
+    for(int i=0; i<10; i++){
+        auto start = high_resolution_clock::now();
+        optimize4(&vector, &dest);
+        auto end = high_resolution_clock::now();
+        T += duration_cast<duration<double, milli>>(end - start).count();
+    }
     cout << dest << endl;
-    cout << duration_cast<duration<double, milli>>(end - start).count() << endl;
+    cout << T/10 << endl;
 
-    // optimize5
-    start = high_resolution_clock::now();
-    optimize5(&vector, &dest);
-    end = high_resolution_clock::now();
+
+    T = 0.0;
+    for(int i=0; i<10; i++){
+        auto start = high_resolution_clock::now();
+        optimize5(&vector, &dest);
+        auto end = high_resolution_clock::now();
+        T += duration_cast<duration<double, milli>>(end - start).count();
+    }
     cout << dest << endl;
-    cout << duration_cast<duration<double, milli>>(end - start).count() << endl;
-
-    // float T = 0.0;
-    // for(int i=0; i<10; i++){
-    //     auto start = high_resolution_clock::now();
-    //     optimize1(&vector, &dest);
-    //     auto end = high_resolution_clock::now();
-    //     T += duration_cast<duration<double, milli>>(end - start).count();
-    // }
-    // cout << T/10 << endl;
-
-    // T = 0.0;
-    // for(int i=0; i<10; i++){
-    //     auto start = high_resolution_clock::now();
-    //     optimize2(&vector, &dest);
-    //     auto end = high_resolution_clock::now();
-    //     T += duration_cast<duration<double, milli>>(end - start).count();
-    // }
-    // cout << T/10 << endl;
-
-    // T = 0.0;
-    // for(int i=0; i<10; i++){
-    //     auto start = high_resolution_clock::now();
-    //     optimize3(&vector, &dest);
-    //     auto end = high_resolution_clock::now();
-    //     T += duration_cast<duration<double, milli>>(end - start).count();
-    // }
-    // cout << T/10 << endl;
-
-
-    // T = 0.0;
-    // for(int i=0; i<10; i++){
-    //     auto start = high_resolution_clock::now();
-    //     optimize4(&vector, &dest);
-    //     auto end = high_resolution_clock::now();
-    //     T += duration_cast<duration<double, milli>>(end - start).count();
-    // }
-    // cout << T/10 << endl;
-
-
-    // T = 0.0;
-    // for(int i=0; i<10; i++){
-    //     auto start = high_resolution_clock::now();
-    //     optimize5(&vector, &dest);
-    //     auto end = high_resolution_clock::now();
-    //     T += duration_cast<duration<double, milli>>(end - start).count();
-    // }
-    // cout << T/10 << endl;
+    cout << T/10 << endl;
 
     return 0;
 }
