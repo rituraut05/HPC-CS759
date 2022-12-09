@@ -1,0 +1,19 @@
+# #ignore all kind of files
+# *
+# #except php files
+# !HW02/*.cpp
+# !HW01
+# !HW03/*.cu
+# !HW07/*
+
+HW01/*
+HW02/*
+HW03/*
+HW04/*
+HW05/*
+HW06/*
+HW04-1/*
+HW07/*
+HW09/*
+HW10/*
+
