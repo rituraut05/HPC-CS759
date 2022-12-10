@@ -26,30 +26,31 @@ void print_sudoku(int* board){
 }
 
 
-bool check_row(vector<vector<int> > &sudoku, int row, int num){
-    for(int i = 0; i < sudoku[row].size(); i++){
-        if(sudoku[row][i] == num){
+bool check_row(int* &sudoku, int row, int num){
+    for(int i = 0; i < N; i++){
+        if(sudoku[row*N + i] == num){
             return false;
         }
     }
     return true;
 }
 
-bool check_col(vector<vector<int> > &sudoku, int col, int num){
-    for(int i = 0; i < sudoku.size(); i++){
-        if(sudoku[i][col] == num){
+bool check_col(int* &sudoku, int col, int num){
+    for(int i = 0; i < N; i++){
+        if(sudoku[i*N + col] == num){
             return false;
         }
     }
     return true;
 }
 
-bool check_box(vector<vector<int> > &sudoku, int row, int col, int num){
-    int row_start = (row/3)*3;
-    int col_start = (col/3)*3;
-    for(int i = row_start; i < row_start+3; i++){
-        for(int j = col_start; j < col_start+3; j++){
-            if(sudoku[i][j] == num){
+bool check_box(int* &sudoku, int row, int col, int num){
+
+    int row_start = (row/Nr)*Nr;
+    int col_start = (col/Nr)*Nr;
+    for(int i = 0; i < Nr; i++){
+        for(int j = 0; j < Nr; j++){
+            if(sudoku[(row_start+i)*N + col_start+j] == num){
                 return false;
             }
         }
@@ -57,14 +58,14 @@ bool check_box(vector<vector<int> > &sudoku, int row, int col, int num){
     return true;
 }
 
-bool check(vector<vector<int> > &sudoku, int row, int col, int num){
+bool check(int* &sudoku, int row, int col, int num){
     return check_row(sudoku, row, num) and check_col(sudoku, col, num) and check_box(sudoku, row, col, num);
 }
 
-bool find_empty(vector<vector<int> > &sudoku, int &row, int &col){
-    for(row = 0; row < sudoku.size(); row++){
-        for(col = 0; col < sudoku[row].size(); col++){
-            if(sudoku[row][col] == 0){
+bool find_empty(int* &sudoku, int &row, int &col){
+    for(row = 0; row < N; row++){
+        for(col = 0; col < N; col++){
+            if(sudoku[row*N + col] == 0){
                 return true;
             }
         }
