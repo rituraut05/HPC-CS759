@@ -47,24 +47,6 @@ __global__ void bfs(int* prev_sudoku, int* next_sudoku, int total_boards, int* b
             *solved = 1;
             return;
         }
-
-        // for(int i = 1; i <= N; i++){
-        //     if(check(prev_board, row, col, i)){
-        //         int* next_board = next_sudoku + *boards_ptr * N2;
-        //         memcpy(next_board, prev_board, N2*sizeof(int));
-        //         next_board[empty_space] = i;
-        //         num_empty_cells[*boards_ptr] = empty_space_count - 1;
-        //         atomicAdd(boards_ptr, 1);
-        //     }
-        // }
-
-        // int empty_space_count = 0;
-        // for(int i = 0; i < N2; i++){
-        //     if(next_board[i] == 0){
-        //         empty_cells_ptr[empty_space_count] = i;
-        //         empty_space_count++;
-        //     }
-        // }
         id += blockDim.x * gridDim.x;
     }
 } 
@@ -148,53 +130,7 @@ int main(int argc, char* argv[]){
 
         cout<<*total_boards<<endl;
 
-        cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Iteration: "<<iter<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
-        // cout<<"#############################################"<<endl;
-        // cout<<"Prev sudoku"<<endl;
-        // for(int i = 0; i < *total_boards * N2; i++){
-        //     cout<<prev_sudoku[i]<<" ";
-        //     if((i+1)%N == 0){
-        //         cout<<endl;
-        //     }
-        //     if((i+1)%N2 == 0){
-        //         cout<<endl;
-        //     }
-        // }
-
-        // cout<<"#############################################"<<endl;
-        // cout<<"Next sudoku"<<endl;
-        // for(int i = 0; i < *total_boards * N2; i++){
-        //     cout<<next_sudoku[i]<<" ";
-        //     if((i+1)%N == 0){
-        //         cout<<endl;
-        //     }
-        //     if((i+1)%N2 == 0){
-        //         cout<<endl;
-        //     }
-        // }
-
-        // // print empty cells
-        // cout<<"#############################################"<<endl;
-        // cout<<"Empty cells"<<endl;
-        // for(int i = 0; i < *total_boards * N2; i++){
-        //     cout<<empty_cells[i]<<" ";
-        //     if((i+1)%N == 0){
-        //         cout<<endl;
-        //     }
-        //     if((i+1)%N2 == 0){
-        //         cout<<endl;
-        //     }
-        // }
-
-        // // print num empty cells
-        // cout<<"#############################################"<<endl;
-        // cout<<"Num empty cells"<<endl;
-        // for(int i = 0; i < *total_boards; i++){
-        //     cout<<num_empty_cells[i]<<endl;
-        // }
-
-        // cout<<"#############################################"<<endl;
-        // cout<<"Total boards: "<<*total_boards<<endl; 
+        cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Iteration: "<<iter<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl; 
 
         int *temp = prev_sudoku;
         prev_sudoku = next_sudoku;
