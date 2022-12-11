@@ -26,3 +26,13 @@ void print_sudoku(int* board){
         cout<<endl;
     }
 }
+
+void write_file(string filename, int* board){
+    ofstream file(filename);
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            file<<board[i*N + j];
+        }
+        file<<endl;
+    }
+}
