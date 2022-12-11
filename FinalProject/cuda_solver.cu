@@ -14,6 +14,7 @@ using namespace std;
 
 __global__ void fill_empty_cells(int* sudoku, int total_boards, int* empty_cells, int* num_empty_cells){
     int id = blockIdx.x * blockDim.x + threadIdx.x;
+    printf("id: %d\n", id);
     while(id < total_boards){
         int* board = sudoku + id * N2;
         int* empty_cells_ptr = empty_cells + id * N2;
@@ -74,13 +75,11 @@ __global__ void backtracking(int* sudoku, int total_boards, int* empty_cells, in
 
 
 // BFS kernel
-__global__ void bfs(int* prev_sudoku, int* next_sudoku, int total_boards, int* boards_ptr, int* empty_cells, int* num_empty_cells, int *solved){
+__global__ void bfs(int* prev_sudoku, int* next_sudoku, int total_boards, int* boards_ptr, int *solved){
     int id = blockIdx.x * blockDim.x + threadIdx.x;
 
     while(id < total_boards){
         int* prev_board = prev_sudoku + id * N2;
-
-        int* empty_cells_ptr = empty_cells + id * N2;
 
         int empty_space;
         if (find_empty(prev_board, empty_space)){
@@ -90,20 +89,10 @@ __global__ void bfs(int* prev_sudoku, int* next_sudoku, int total_boards, int* b
             for(int i = 1; i <= N; i++){
                 if(check(prev_board, row, col, i)){
                     int next_boards_ptr = atomicAdd(boards_ptr, 1);
-                    printf("id: %d, next_boards_ptr: %d, boards_ptr: %d\n", id, next_boards_ptr, *boards_ptr);
+                    // printf("id: %d, next_boards_ptr: %d, boards_ptr: %d\n", id, next_boards_ptr, *boards_ptr);
                     int* next_board = next_sudoku + next_boards_ptr * N2;
                     memcpy(next_board, prev_board, N2*sizeof(int));
                     next_board[empty_space] = i;
-
-                    // int empty_space_count = 0;
-                    // memset(empty_cells_ptr, 0, N2*sizeof(int));
-                    // for(int i = 0; i < N2; i++){
-                    //     if(next_board[i] == 0){
-                    //         empty_cells_ptr[empty_space_count] = i;
-                    //         empty_space_count++;
-                    //     }
-                    // }
-                    // num_empty_cells[next_boards_ptr] = empty_space_count;
                 }
             }
         }
@@ -140,36 +129,21 @@ int main(int argc, char* argv[]){
     // 2^2 * 81 = 324 size of one board
     // 324 * 2^28 = 6GB
 
-    // cout<<"Assigning memory..."<<endl;
     int max_boards = pow(2, 20);
     int tot_size_boards = N2 * max_boards;
 
-    // cout<<"Assigning memory... to prev_sudoku"<<endl;
     cudaMallocManaged(&prev_sudoku, tot_size_boards * sizeof(int));
     memset(prev_sudoku, 0, tot_size_boards * sizeof(int));
     memcpy(prev_sudoku, sudoku, N2*sizeof(int));
 
-    // cout<<"Assigning memory... to next_sudoku"<<endl;
     cudaMallocManaged(&next_sudoku, tot_size_boards * sizeof(int));
     memset(next_sudoku, 0, tot_size_boards * sizeof(int));
 
-    int* empty_cells;
-    // cout<<"Assigning memory... to empty_cells"<<endl;
-    cudaMallocManaged(&empty_cells, tot_size_boards * sizeof(int));
-    memset(empty_cells, 0, tot_size_boards * sizeof(int));
-
-    int* num_empty_cells;
-    // cout<<"Assigning memory... to num_empty_cells"<<endl;
-    cudaMallocManaged(&num_empty_cells, max_boards * sizeof(int));
-    memset(num_empty_cells, 0, max_boards * sizeof(int));
-
     int* boards_ptr;
-    // cout<<"Assigning memory... to boards_ptr"<<endl;
     cudaMallocManaged(&boards_ptr, sizeof(int));
     *boards_ptr = 0;
 
     int* total_boards;
-    // cout<<"Assigning memory... to total_boards"<<endl;
     cudaMallocManaged(&total_boards, sizeof(int));
     *total_boards = 1;
 
@@ -181,9 +155,10 @@ int main(int argc, char* argv[]){
     dim3 dimBlock(threadsPerBlock);
 
     int iter = 0;
+    int prev_total_boards = 0;
     
     while(*total_boards < max_boards){
-        bfs <<<dimGrid, dimBlock>>> (prev_sudoku, next_sudoku, *total_boards, boards_ptr, empty_cells, num_empty_cells, solved);
+        bfs <<<dimGrid, dimBlock>>> (prev_sudoku, next_sudoku, *total_boards, boards_ptr, solved);
         cudaDeviceSynchronize();
 
         *total_boards = *boards_ptr;
@@ -203,50 +178,30 @@ int main(int argc, char* argv[]){
         else if(*total_boards >= max_boards){
             cout<<"Too many boards..."<<endl;
             cout<<"Starting backtracking..."<<endl;
+            *total_boards = prev_total_boards;
+
             break;
-        }
-        cout<<*total_boards<<endl;
-        
-        cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Iteration: "<<iter<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl; 
+        }        
+        cout<<"Iteration:"<<iter<<" Total boards:"<<*total_boards<<endl; 
 
         int *temp = prev_sudoku;
         prev_sudoku = next_sudoku;
         next_sudoku = temp;
+        prev_total_boards = *total_boards;
         iter++;
-        // cout<<"#############################################"<<endl;
-        // cout<<"Prev sudoku"<<endl;
-        // for(int i = 0; i < *total_boards * N2; i++){
-        //     cout<<prev_sudoku[i]<<" ";
-        //     if((i+1)%N == 0){
-        //         cout<<endl;
-        //     }
-        //     if((i+1)%N2 == 0){
-        //         cout<<endl;
-        //     }
-        // }
-
-        // cout<<"#############################################"<<endl;
-        // cout<<"Empty cells"<<endl;
-        // for(int i = 0; i < *total_boards * N2; i++){
-        //     cout<<empty_cells[i]<<" ";
-        //     if((i+1)%N == 0){
-        //         cout<<endl;
-        //     }
-        //     if((i+1)%N2 == 0){
-        //         cout<<endl;
-        //     }
-        // }
-
-        // cout<<"#############################################"<<endl;
-        // cout<<"Num empty cells"<<endl;
-        // for(int i = 0; i < *total_boards; i++){
-        //     cout<<num_empty_cells[i]<<" ";
-        // }
     }
 
 
-
     cout<<"Filling empty cells..."<<endl;
+    int* empty_cells;
+    cudaMallocManaged(&empty_cells, N2* (*total_boards) * sizeof(int));
+    memset(empty_cells, 0, tot_size_boards * sizeof(int));
+    cout<<"Empty cells allocated"<<endl;
+
+    int* num_empty_cells;
+    cudaMallocManaged(&num_empty_cells, (*total_boards) * sizeof(int));
+    memset(num_empty_cells, 0, max_boards * sizeof(int));
+    cout<<"Num empty cells allocated"<<endl;
 
     fill_empty_cells <<<dimGrid, dimBlock>>> (prev_sudoku, *total_boards, empty_cells, num_empty_cells);
     cudaDeviceSynchronize();
