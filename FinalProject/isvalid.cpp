@@ -106,6 +106,8 @@ bool is_valid(vector<vector<int> > &sudoku){
                     cout<<"Not valid at "<<i<<","<<j<<" with value "<<sudoku[i][j]<<endl;
                     return false;
                 }
+            }else{
+                return false;
             }
         }
     }
