@@ -141,10 +141,12 @@ int main(int argc, char* argv[]){
     // 2^2 * 81 = 324 size of one board
     // 324 * 2^28 = 6GB
 
+    double max_size = pow(2, 35);
+    int ints_size = sizeof(int) * N2;
     int* max_boards;
     cudaMallocManaged(&max_boards, sizeof(int));
-    *max_boards= pow(2, 12);
-    int tot_size_boards = N2 * (*max_boards);
+    *max_boards= max_size / ints_size;
+    int tot_size_boards = ints_size * (*max_boards);
 
     cudaMallocManaged(&prev_sudoku, tot_size_boards * sizeof(int));
     memset(prev_sudoku, 0, tot_size_boards * sizeof(int));
@@ -164,14 +166,6 @@ int main(int argc, char* argv[]){
     int* solved;
     cudaMallocManaged(&solved, sizeof(int));
     *solved = 0;
-
-    int* empty_cells;
-    cudaMallocManaged(&empty_cells, N2 * sizeof(int));
-    memset(empty_cells, 0, N2 * sizeof(int));
-
-    int* num_empty_cells;
-    cudaMallocManaged(&num_empty_cells, sizeof(int));
-    *num_empty_cells = 0;
 
     dim3 dimGrid(blocksPerGrid);
     dim3 dimBlock(threadsPerBlock);
@@ -215,6 +209,13 @@ int main(int argc, char* argv[]){
 
 
     cudaFree(next_sudoku);
+    int* empty_cells;
+    cudaMallocManaged(&empty_cells, N2 * sizeof(int));
+    memset(empty_cells, 0, N2 * sizeof(int));
+
+    int* num_empty_cells;
+    cudaMallocManaged(&num_empty_cells, sizeof(int));
+    *num_empty_cells = 0;
     cout<<"Filling empty cells..."<<endl;
     int count = 0;
     for(int i=0; i<N2; i++){
