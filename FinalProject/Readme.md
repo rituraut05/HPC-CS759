@@ -31,3 +31,4 @@ sbatch run.sh
 
 6. `puzzles` folder has the input files for different sudoku ranks.
 
+7. `run.sh` file has the command which executes with executable `cuda`. There are 3 command line arguments given to it: threads per block, blocks per grid, input puzzle file
