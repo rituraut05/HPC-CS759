@@ -17,6 +17,12 @@ void read_file(string filename, vector<vector<int> > &sudoku){
     while(getline(file, line)){
         vector<int> row;
         for(int i = 0; i < line.size(); i++){
+            int num = 0;
+            while(line[i]!=' ' && i<line.size()){
+                num = num*10 + (line[i] - '0');
+                i++;
+            }
+
             row.push_back(line[i] - '0');
         }
         sudoku.push_back(row);

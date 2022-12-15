@@ -11,9 +11,19 @@ void read_file(string filename, int* board){
     string line;
     int i = 0;
     while(getline(file, line)){
-        for(int j = 0; j < N; j++){
-            board[i*N + j] = line[j] - '0';
+        int j = 0;
+        int num = 0;
+        for(int k = 0; k < line.length(); k++){
+            if(line[k] == ' '){
+                board[i*N + j] = num;
+                j++;
+                num = 0;
+            }
+            else{
+                num = num*10 + (line[k] - '0');
+            }
         }
+        board[i*N + j] = num;
         i++;
     }
 }

@@ -6,5 +6,5 @@
 #SBATCH --gres=gpu:1
 #SBATCH -t 0-00:30:00
 
-cuda-memcheck ./cuda 512 256 ./puzzles/16/easy1.txt
-# nvidia-smi
+nvcc cuda_solver.cu helper.cu -o cuda
+./cuda 512 256 ./puzzles/9/easy_1.txt

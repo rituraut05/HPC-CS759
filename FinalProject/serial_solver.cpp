@@ -6,24 +6,27 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-
+#include <chrono>
 
 using namespace std;
-
+using namespace chrono;
 
 void read_file(string filename, vector<vector<int> > &sudoku){
     ifstream file(filename);
     string line;
-    int lineCount = 0;
-    while(getline(file, line) and lineCount<10){
+    while(getline(file, line)){
         vector<int> row;
-        lineCount+=1;
-        if(lineCount==1){
-            continue;
+        int num = 0;
+        for(int i = 0; i < line.length(); i++){
+            if(line[i] == ' '){
+                row.push_back(num);
+                num = 0;
+            }
+            else{
+                num = num*10 + (line[i] - '0');
+            }
         }
-        for(int i = 0; i < line.size(); i++){
-            row.push_back(line[i] - '0');
-        }
+        row.push_back(num);
         sudoku.push_back(row);
     }
 }
@@ -90,8 +93,10 @@ bool solve(vector<vector<int> > &sudoku){
     }
     for(int i = 1; i <= 9; i++){
         if(check(sudoku, row, col, i)){
+            printf("Trying %d at (%d, %d)\n", i, row, col);
             sudoku[row][col] = i;
             if(solve(sudoku)){
+                printf("Solved sudoku\n");
                 return true;
             }
             sudoku[row][col] = 0;
@@ -100,12 +105,20 @@ bool solve(vector<vector<int> > &sudoku){
     return false;
 }
 
-int main(){
+// measure time taken to solve sudoku
+
+int main(int argc, char *argv[]){
+    string filename = argv[1];
+
     vector<vector<int> > sudoku;
-    read_file("sudoku.txt", sudoku);
+    read_file(filename, sudoku);
     print_sudoku(sudoku);
     cout << endl;
+    auto start = high_resolution_clock::now();
     solve(sudoku);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
     print_sudoku(sudoku);
     return 0;
 }

@@ -5,10 +5,14 @@
 #include <iostream>
 #include <vector>
 #include <string>
+// add timer
+#include <chrono>
+#include <ctime>
 
 #include "helper.cuh"
 
 using namespace std;
+using namespace chrono;
 
 // Kernel Fill empty cells for all the N2 boards in the sudoku array with the empty cells index
 
@@ -34,7 +38,7 @@ __global__ void fill_empty_cells(int* sudoku, int total_boards, int* empty_cells
 // Iterative Backtracking kernel
 __global__ void backtracking(int* sudoku, int total_boards, int* empty_cells, int num_empty_cells, int* solved, int* lock){
     int id = blockIdx.x * blockDim.x + threadIdx.x;
-
+    // printf("id: %d\n", id);
     while(id < total_boards && *solved == 0){
         int* board = sudoku + id * N2;
         int empty_id = 0;
@@ -129,10 +133,12 @@ int main(int argc, char* argv[]){
     string filename = argv[3];
 
     int* sudoku = new int[N2];
+    cout<<"Input Sudoku:"<<endl;
     read_file(filename, sudoku);
     print_sudoku(sudoku);
     cout<<endl;
 
+    cout<<"Solving Sudoku..."<<endl;
     int* prev_sudoku = new int[N2];
     int* next_sudoku = new int[N2];
 
@@ -140,29 +146,46 @@ int main(int argc, char* argv[]){
     // max_boards = 2^28
     // 2^2 * 81 = 324 size of one board
     // 324 * 2^28 = 6GB
-
-    double max_size = pow(2, 35);
-    int ints_size = sizeof(int) * N2;
+    // int max_boards = pow(2, 28);
     int* max_boards;
     cudaMallocManaged(&max_boards, sizeof(int));
-    *max_boards= max_size / ints_size;
-    int tot_size_boards = ints_size * (*max_boards);
+    if(N == 9){
+        *max_boards = pow(2, 28);
+    }else if(N == 16){
+        *max_boards = pow(2, 20);
+    }else{
+        *max_boards = pow(2, 22);
+    }
+    int tot_size_boards = N2 * (*max_boards);
 
+    cout<<"max_boards: "<<*max_boards<<endl;
+
+    // double tot_size_boards = pow(2, 32);
+    // *max_boards= tot_size_boards / N2;
+    // int tot_size_boards = N2 * (*max_boards);
+    // *max_boards= max_size / ints_size;
+    // int tot_size_boards = ints_size * (*max_boards);
+
+    // cout<<"Assigning prev_sudoku..."<<endl;
     cudaMallocManaged(&prev_sudoku, tot_size_boards * sizeof(int));
     memset(prev_sudoku, 0, tot_size_boards * sizeof(int));
     memcpy(prev_sudoku, sudoku, N2*sizeof(int));
 
+    // cout<<"Assigning next_sudoku..."<<endl;
     cudaMallocManaged(&next_sudoku, tot_size_boards * sizeof(int));
     memset(next_sudoku, 0, tot_size_boards * sizeof(int));
 
+    // cout<<"Assigning memory to boards_ptr..."<<endl;
     int* boards_ptr;
     cudaMallocManaged(&boards_ptr, sizeof(int));
     *boards_ptr = 0;
 
+    // cout<<"Assigning memory to total_boards..."<<endl;
     int* total_boards;
     cudaMallocManaged(&total_boards, sizeof(int));
     *total_boards = 1;
 
+    // cout<<"Assigning memory to solved..."<<endl;
     int* solved;
     cudaMallocManaged(&solved, sizeof(int));
     *solved = 0;
@@ -173,18 +196,36 @@ int main(int argc, char* argv[]){
     int iter = 0;
     int prev_total_boards = 0;
     
+    cout<<"Starting BFS..."<<endl;
+
+    // start timer
+    // start cuda timer event
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
+
+    // auto start = high_resolution_clock::now();
     while(*total_boards < (*max_boards)){
+        iter++;
         bfs <<<dimGrid, dimBlock>>> (prev_sudoku, next_sudoku, *total_boards, boards_ptr, solved, *max_boards);
         cudaDeviceSynchronize();
 
         *total_boards = *boards_ptr;
         *boards_ptr = 0;
+        cout<<"Iteration: "<<iter<<" Total boards: "<<*total_boards<<endl;
 
         if(*solved == 1){
             cout<<"Solved!!!!!!!"<<endl;
             memcpy(sudoku, prev_sudoku, N2*sizeof(int));
             print_sudoku(sudoku);
             write_file("result.txt", sudoku);
+            cudaEventRecord(stop);
+            cudaEventSynchronize(stop);
+            float milliseconds = 0;
+            cudaEventElapsedTime(&milliseconds, start, stop);
+            cout<<"Time: "<<milliseconds<<" ms"<<endl;
+
             return 0;
         }else if (*solved == -1){
             cout<<"Too many boards..."<<endl;
@@ -195,6 +236,12 @@ int main(int argc, char* argv[]){
 
         if (*total_boards == 0){
             cout<<"No solution"<<endl;
+            cudaEventRecord(stop);
+            cudaEventSynchronize(stop);
+            float milliseconds = 0;
+            cudaEventElapsedTime(&milliseconds, start, stop);
+            cout<<"Time: "<<milliseconds<<" ms"<<endl;
+
             return 0;
         }
                 
@@ -236,6 +283,15 @@ int main(int argc, char* argv[]){
 
     backtracking <<<dimGrid, dimBlock>>> (prev_sudoku, *total_boards, empty_cells, *num_empty_cells, solved, lock);
     cudaDeviceSynchronize();
+
+    // stop timer
+    // stop cuda timer event
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    cout<<"Time: "<<milliseconds<<" ms"<<endl;
+
     
     if(*solved==1){
         cout<<"Solution: "<<endl;
